@@ -68,11 +68,22 @@ namespace BigTed
 				clsUIInputSetHostView = new Class (ptrUIInputSetHostView);
 		}
 
+		public ProgressHUD (UIView parentContainer)
+		{
+			ParentContainer = parentContainer;
+			Initialize ();
+		}
+
 		public ProgressHUD () : this (UIScreen.MainScreen.Bounds)
 		{
 		}
 
 		public ProgressHUD (CGRect frame) : base (frame)
+		{
+			Initialize ();
+		}
+
+		void Initialize ()
 		{
 			UserInteractionEnabled = false;
 			BackgroundColor = UIColor.Clear;
@@ -123,6 +134,7 @@ namespace BigTed
 		public UITextAlignment HudTextAlignment = UITextAlignment.Center;
 		public Ring Ring = new Ring ();
 		static NSObject obj = new NSObject ();
+		public UIView ParentContainer;
 
 		public void Show (string status = null, float progress = -1, MaskType maskType = MaskType.None, double timeoutMs = 1000)
 		{
@@ -266,17 +278,24 @@ namespace BigTed
 		                         ToastPosition toastPosition = ToastPosition.Center, string cancelCaption = null, Action cancelCallback = null, 
 		                         double timeoutMs = 1000, bool showContinuousProgress = false, UIImage displayContinuousImage = null)
 		{
-
 			Ring.ResetStyle(IsiOS7ForLookAndFeel, (IsiOS7ForLookAndFeel ? TintColor : UIColor.White));
 
-
-			if (OverlayView.Superview == null) {
-				var windows = UIApplication.SharedApplication.Windows;
-				Array.Reverse (windows);
-				foreach (UIWindow window in windows) {
-					if (window.WindowLevel == UIWindowLevel.Normal && !window.Hidden) {
-						window.AddSubview (OverlayView);
-						break;
+			if (OverlayView.Superview == null)
+			{
+				if (ParentContainer != null)
+				{
+					ParentContainer.AddSubview (OverlayView);
+				}
+				else {
+					var windows = UIApplication.SharedApplication.Windows;
+					Array.Reverse (windows);
+					foreach (UIWindow window in windows)
+					{
+						if (window.WindowLevel == UIWindowLevel.Normal && !window.Hidden)
+						{
+							window.AddSubview (OverlayView);
+							break;
+						}
 					}
 				}
 			}
